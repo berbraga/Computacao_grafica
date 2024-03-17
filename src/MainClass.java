@@ -17,7 +17,7 @@ public class MainClass {
 		    @Override
 		    public void windowClosing(WindowEvent e) {
 		        System.exit(0);
-		    }
+		    }  
 		});
 		
 		meuCanvas.start();
