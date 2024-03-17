@@ -1,4 +1,4 @@
-import java.awt.Canvas;
+/*import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -80,8 +80,12 @@ public class MainCanvas extends JPanel implements Runnable{
 //			e1.printStackTrace();
 //		}
 		
+
 		imgtmp = loadImage("fundo.jpg");
-		
+		if (imgtmp == null) {
+			System.out.println("Falha ao carregar a imagem. Verifique o caminho e tente novamente.");
+			// Talvez você queira parar a execução ou carregar uma imagem padrão
+		}
 		imageBuffer = new BufferedImage(640,480, BufferedImage.TYPE_4BYTE_ABGR);
 		//imageBuffer.getGraphics().drawImage(imgtmp, 0, 0, null);
 		
@@ -132,26 +136,26 @@ public class MainCanvas extends JPanel implements Runnable{
 		//memoriaPlacaVideo = new byte[W*H];
 		
 		
-		/*paleta = new short[255][3];
-		
-		for(int i = 0; i < 255;i++){
-			paleta[i][0] = (short)rand.nextInt(255);
-			paleta[i][1] = (short)rand.nextInt(255);
-			paleta[i][2] = (short)rand.nextInt(255);
-			
-		}*/
+//		paleta = new short[255][3];
+//
+//		for(int i = 0; i < 255;i++){
+//			paleta[i][0] = (short)rand.nextInt(255);
+//			paleta[i][1] = (short)rand.nextInt(255);
+//			paleta[i][2] = (short)rand.nextInt(255);
+//
+//		}
 		
 		//Seta Bugfeer com noise
-		/*for(int i = 0; i < bufferDeVideo.length;i+=4){
-			int r = rand.nextInt(255);
-			int g = rand.nextInt(255);
-			int b = rand.nextInt(255);
-			
-			bufferDeVideo[i] = (byte)0x00ff;
-			bufferDeVideo[i+1] = (byte)(0x00ff&b);
-			bufferDeVideo[i+2] = (byte)(0x00ff&g);
-			bufferDeVideo[i+3] = (byte)(0x00ff&r);
-		}8?
+//		for(int i = 0; i < bufferDeVideo.length;i+=4){
+//			int r = rand.nextInt(255);
+//			int g = rand.nextInt(255);
+//			int b = rand.nextInt(255);
+//
+//			bufferDeVideo[i] = (byte)0x00ff;
+//			bufferDeVideo[i+1] = (byte)(0x00ff&b);
+//			bufferDeVideo[i+2] = (byte)(0x00ff&g);
+//			bufferDeVideo[i+3] = (byte)(0x00ff&r);
+//		}
 		
 //		// 100,20 200,20
 //		for(int i = 0; i < 100;i++){
@@ -164,11 +168,11 @@ public class MainCanvas extends JPanel implements Runnable{
 //			bufferDeVideo[bt+3] = (byte)0x00ff;
 //		}
 		
-		/*for(int y = 0; y < H;y++){
-			for(int x = 0; x < W;x++){
-				memoriaPlacaVideo[x+y*W] = (byte)((y%255)&0x00ff);
-			}
-		}*/
+//		for(int y = 0; y < H;y++){
+//			for(int x = 0; x < W;x++){
+//				memoriaPlacaVideo[x+y*W] = (byte)((y%255)&0x00ff);
+//			}
+//		}
 		addKeyListener(new KeyListener() {
 			
 			@Override
@@ -338,13 +342,13 @@ public class MainCanvas extends JPanel implements Runnable{
 //			bufferDeVideo[i+3] = (byte)(0x00ff&rr);
 //		}
 		
-		/*for(int i = 0; i < memoriaPlacaVideo.length;i++){
-			int bufferindex = i*4;
-			bufferDeVideo[bufferindex] = (byte)0x00ff;
-			bufferDeVideo[bufferindex+1] = (byte)(paleta[memoriaPlacaVideo[i]&0x00ff][2]&0x00ff);
-			bufferDeVideo[bufferindex+2] = (byte)(paleta[memoriaPlacaVideo[i]&0x00ff][1]&0x00ff);
-			bufferDeVideo[bufferindex+3] = (byte)(paleta[memoriaPlacaVideo[i]&0x00ff][0]&0x00ff);
-		}*/
+//		for(int i = 0; i < memoriaPlacaVideo.length;i++){
+//			int bufferindex = i*4;
+//			bufferDeVideo[bufferindex] = (byte)0x00ff;
+//			bufferDeVideo[bufferindex+1] = (byte)(paleta[memoriaPlacaVideo[i]&0x00ff][2]&0x00ff);
+//			bufferDeVideo[bufferindex+2] = (byte)(paleta[memoriaPlacaVideo[i]&0x00ff][1]&0x00ff);
+//			bufferDeVideo[bufferindex+3] = (byte)(paleta[memoriaPlacaVideo[i]&0x00ff][0]&0x00ff);
+//		}
 		
 		g.setFont(f);
 		
@@ -435,6 +439,10 @@ public class MainCanvas extends JPanel implements Runnable{
 	
 	@Override
 	public void run() {
+		if (imgtmp == null) {
+			System.out.println("A imagem não foi carregada corretamente. O loop de execução será encerrado.");
+			return; // Encerra a execução do método run se a imagem não foi carregada
+		}
 		long time = System.currentTimeMillis();
 		long segundo = time/1000;
 		long diftime = 0;
@@ -461,21 +469,173 @@ public class MainCanvas extends JPanel implements Runnable{
 			}
 		}
 	}
-	
+
 	public BufferedImage loadImage(String filename) {
+		BufferedImage img = null;
 		try {
-			imgtmp = ImageIO.read(new File(filename));
-			
-			BufferedImage imgout = new BufferedImage(imgtmp.getWidth(), imgtmp.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-			
-			imgout.getGraphics().drawImage(imgtmp, 0, 0, null);
-			
-			imgtmp = null;
-			
-			return imgout;
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return null;
+			img = ImageIO.read(new File(filename));
+			if (img != null) {
+				BufferedImage imgout = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+				Graphics g = imgout.getGraphics();
+				g.drawImage(img, 0, 0, null);
+				g.dispose(); // Boa prática para liberar recursos do sistema gráfico explicitamente
+				return imgout;
+			}
+		} catch (IOException e) {
+			System.out.println("Erro ao carregar a imagem: " + e.getMessage());
+			// Você pode querer logar o erro ou reagir de forma diferente
+		}
+		return null; // Retorna null caso a imagem não possa ser carregada
+	}
+}
+*/
+
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.JPanel;
+
+public class MainCanvas extends JPanel implements Runnable, MouseListener {
+	int W = 640;
+	int H = 480;
+
+	Thread runner;
+	boolean ativo = true;
+	int fps = 0;
+
+	BufferedImage imageBuffer;
+	byte[] bufferDeVideo;
+
+	Point firstClick = null;
+
+	public MainCanvas() {
+		setSize(W, H);
+		setFocusable(true);
+		setBackground(Color.WHITE);
+		addMouseListener(this);
+
+		imageBuffer = new BufferedImage(W, H, BufferedImage.TYPE_4BYTE_ABGR);
+		bufferDeVideo = ((DataBufferByte)imageBuffer.getRaster().getDataBuffer()).getData();
+
+		runner = new Thread(this);
+		runner.start();
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// Não é necessário implementar
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		if (firstClick == null) {
+			firstClick = e.getPoint();
+		} else {
+			Point secondClick = e.getPoint();
+			bresenhamLine(firstClick.x, firstClick.y, secondClick.x, secondClick.y);
+			firstClick = null; // Reset para o próximo primeiro clique
+			repaint(); // Solicita o redesenho do painel
+		}
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// Não é necessário implementar
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// Não é necessário implementar
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// Não é necessário implementar
+	}
+
+	public void bresenhamLine(int x1, int y1, int x2, int y2) {
+		int d = 0;
+
+		int dx = Math.abs(x2 - x1);
+		int dy = Math.abs(y2 - y1);
+
+		int dx2 = 2 * dx; // slope scaling factors to avoid floating
+		int dy2 = 2 * dy; // point
+
+		int ix = x1 < x2 ? 1 : -1; // increment direction
+		int iy = y1 < y2 ? 1 : -1;
+
+		int x = x1;
+		int y = y1;
+
+		if (dx >= dy) {
+			while (true) {
+				desenhaPixel(x, y, 0, 0, 0);
+				if (x == x2)
+					break;
+				x += ix;
+				d += dy2;
+				if (d > dx) {
+					y += iy;
+					d -= dx2;
+				}
+			}
+		} else {
+			while (true) {
+				desenhaPixel(x, y, 0, 0, 0);
+				if (y == y2)
+					break;
+				y += iy;
+				d += dx2;
+				if (d > dy) {
+					x += ix;
+					d -= dy2;
+				}
+			}
+		}
+	}
+
+	public void desenhaPixel(int x, int y, int r, int g, int b) {
+		int index = (y * W + x) * 4;
+		bufferDeVideo[index] = (byte) 255; // Alpha
+		bufferDeVideo[index + 1] = (byte) b;
+		bufferDeVideo[index + 2] = (byte) g;
+		bufferDeVideo[index + 3] = (byte) r;
+	}
+
+	@Override
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		g.drawImage(imageBuffer, 0, 0, this);
+	}
+
+	@Override
+	public void run() {
+		long lastTime = System.nanoTime();
+		final double ns = 1000000000.0 / 60; // 60 times per second
+		double delta = 0;
+
+		while (ativo) {
+			long now = System.nanoTime();
+			delta += (now - lastTime) / ns;
+			lastTime = now;
+
+			if (delta >= 1) {
+				// Update the frame
+				delta--;
+				fps++;
+			}
+
+			repaint();
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }
